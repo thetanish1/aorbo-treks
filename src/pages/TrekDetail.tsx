@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { useParams, Link } from 'react-router-dom';
 import {
   MapPin,
@@ -157,12 +158,17 @@ export const TrekDetail: React.FC = () => {
 
           {/* Image Gallery: Hero + Thumbnails + Lightbox */}
           <div className="mb-10 space-y-3">
-            {/* Main Featured Image */}
+            {/* Main Featured Image with cinematic left-to-right auto-panning Ken Burns effect */}
             <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-2xl overflow-hidden bg-slate-900 shadow-md group">
-              <img
+              <motion.img
+                key={trek.images[selectedImageIndex] || trek.images[0]}
                 src={trek.images[selectedImageIndex] || trek.images[0]}
                 alt={trek.title}
-                className="w-full h-full object-cover transition-transform duration-300"
+                className="w-full h-full object-cover"
+                initial={{ scale: 1.08, x: '-4%' }}
+                animate={{ scale: 1.08, x: '4%' }}
+                transition={{ duration: 10, ease: 'easeInOut', repeat: Infinity, repeatType: 'reverse' }}
+                style={{ transformOrigin: 'center center', width: '108%', maxWidth: 'none', marginLeft: '-4%' }}
               />
               <button
                 type="button"

@@ -20,12 +20,11 @@ import { SEO, createFaqSchema } from '@/components/common/SEO';
 import { TrekCard } from '@/components/trek/TrekCard';
 import { DestinationCard } from '@/components/cards/DestinationCard';
 import { OrganiserCard } from '@/components/cards/OrganiserCard';
-import { BlogCard } from '@/components/cards/BlogCard';
+import { ReviewsMarquee } from '@/components/common/ReviewsMarquee';
 import { useWinterTreks } from '@/hooks/useTreks';
 import {
   usePopularDestinations,
   useOrganisers,
-  useBlogs,
   useGeneralFaqs,
 } from '@/hooks/useDestinations';
 
@@ -38,7 +37,6 @@ export const Home: React.FC = () => {
   const { data: popularDestinations = [] } = usePopularDestinations();
   const { data: winterTreks = [] } = useWinterTreks();
   const { data: organisers = [] } = useOrganisers();
-  const { data: blogs = [] } = useBlogs();
   const { data: faqs = [] } = useGeneralFaqs();
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -51,6 +49,7 @@ export const Home: React.FC = () => {
 
   const quickChips = [
     { label: '❄️ Winter treks', href: '/winter-treks', highlight: true },
+    { label: '⛷️ Auli Snow & Skiing', href: '/treks/auli-snow-trek', highlight: true },
     { label: 'Weekend treks', href: '/treks-near' },
     { label: 'Near me (Hyderabad)', href: '/treks-near?city=hyderabad' },
     { label: 'Himachal', href: '/destinations/himachal-pradesh' },
@@ -59,6 +58,7 @@ export const Home: React.FC = () => {
   ];
 
   const destinationSuggestions = [
+    'Auli Snow & Skiing Trek',
     'Kedarkantha',
     'Auli',
     'Manali',
@@ -303,11 +303,18 @@ export const Home: React.FC = () => {
           />
 
           {/* Horizontally Scrollable Carousel */}
-          <div className="flex items-center gap-5 overflow-x-auto pb-4 scrollbar-none snap-x snap-mandatory">
-            {popularDestinations.map((dest) => (
-              <div key={dest.slug} className="snap-start">
+          <div className="flex items-center gap-5 overflow-x-auto pt-3 pb-6 scrollbar-none snap-x snap-mandatory">
+            {popularDestinations.map((dest, index) => (
+              <motion.div
+                key={dest.slug}
+                className="snap-start flex-shrink-0"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: index * 0.06 }}
+              >
                 <DestinationCard destination={dest} />
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -325,8 +332,17 @@ export const Home: React.FC = () => {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {winterTreks.slice(0, 6).map((trek) => (
-              <TrekCard key={trek.id} trek={trek} />
+            {winterTreks.slice(0, 6).map((trek, index) => (
+              <motion.div
+                key={trek.id}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: index * 0.08 }}
+                className="h-full"
+              >
+                <TrekCard trek={trek} />
+              </motion.div>
             ))}
           </div>
 
@@ -476,22 +492,17 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* --- SECTION 8: BLOGS PREVIEW --- */}
+      {/* --- SECTION 8: CUSTOMER REVIEWS (CONTINUOUS VERTICAL SCROLL) --- */}
       <section className="py-16 sm:py-24 bg-surface-alt border-t border-slate-200/80">
         <div className="max-w-container mx-auto px-4 sm:px-6">
           <SectionHeader
-            eyebrow="From The Trails"
-            title="Latest Trek Guides & Articles"
-            subtitle="Tips from certified mountaineers, layering guides, and trail inspiration across India."
-            viewAllLink="/blogs"
-            viewAllText="View all blogs"
+            align="center"
+            eyebrow="Trekker Stories"
+            title="Real Trekkers, Real Adventures"
+            subtitle="Verified reviews from adventurers who booked and enjoyed trips with certified operators on TrekNest."
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            {blogs.slice(0, 3).map((post) => (
-              <BlogCard key={post.slug} post={post} />
-            ))}
-          </div>
+          <ReviewsMarquee />
         </div>
       </section>
 

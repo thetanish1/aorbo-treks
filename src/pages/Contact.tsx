@@ -3,6 +3,7 @@ import { Mail, Phone, MapPin, Send, CheckCircle2, Instagram, Facebook, Twitter }
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { Button } from '@/components/common/Button';
 import { SEO, createBreadcrumbSchema } from '@/components/common/SEO';
+import { AnimatedGlobe } from '@/components/common/AnimatedGlobe';
 
 export const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -155,6 +156,22 @@ export const Contact: React.FC = () => {
                     </a>
                   </div>
                 </div>
+              </div>
+
+              {/* Interactive Routes Globe */}
+              <div className="bg-white p-6 rounded-card border border-slate-200 shadow-soft">
+                <div className="mb-4">
+                  <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-full mb-1">
+                    Pan-India Network
+                  </span>
+                  <h3 className="font-heading font-bold text-lg text-slate-900">
+                    Live Trek Routes & Hubs
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Connecting adventurers from our Hyderabad basecamp to verified trails across India.
+                  </p>
+                </div>
+                <AnimatedGlobe />
               </div>
             </div>
 

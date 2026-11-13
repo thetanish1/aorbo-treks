@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, Link } from 'react-router-dom';
 import {
   MapPin,
@@ -50,6 +50,15 @@ export const TrekDetail: React.FC = () => {
       setSelectedDuration(trek.durations[0]);
     }
   }, [trek, selectedDuration]);
+
+  // Auto-cycle through the 3 images every 2 seconds with fade-in and left-to-right pan
+  React.useEffect(() => {
+    if (!trek?.images || trek.images.length <= 1) return;
+    const interval = setInterval(() => {
+      setSelectedImageIndex((prev) => (prev + 1) % trek.images.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [trek?.images]);
 
   if (isLoading) {
     return (
@@ -158,22 +167,48 @@ export const TrekDetail: React.FC = () => {
 
           {/* Image Gallery: Hero + Thumbnails + Lightbox */}
           <div className="mb-10 space-y-3">
-            {/* Main Featured Image with cinematic left-to-right auto-panning Ken Burns effect */}
+            {/* Main Featured Image with left-to-right pan & automatic 2-second crossfade */}
             <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-2xl overflow-hidden bg-slate-900 shadow-md group">
-              <motion.img
-                key={trek.images[selectedImageIndex] || trek.images[0]}
-                src={trek.images[selectedImageIndex] || trek.images[0]}
-                alt={trek.title}
-                className="w-full h-full object-cover"
-                initial={{ scale: 1.08, x: '-4%' }}
-                animate={{ scale: 1.08, x: '4%' }}
-                transition={{ duration: 10, ease: 'easeInOut', repeat: Infinity, repeatType: 'reverse' }}
-                style={{ transformOrigin: 'center center', width: '108%', maxWidth: 'none', marginLeft: '-4%' }}
-              />
+              <AnimatePresence initial={false}>
+                <motion.img
+                  key={selectedImageIndex}
+                  src={trek.images[selectedImageIndex] || trek.images[0]}
+                  alt={`${trek.title} - photo ${selectedImageIndex + 1}`}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  initial={{ opacity: 0, scale: 1.08, x: '-5%' }}
+                  animate={{ opacity: 1, scale: 1.08, x: '5%' }}
+                  exit={{ opacity: 0, scale: 1.08, x: '5%' }}
+                  transition={{
+                    opacity: { duration: 0.6, ease: 'easeInOut' },
+                    x: { duration: 2.2, ease: 'linear' },
+                  }}
+                  style={{ transformOrigin: 'center center', width: '110%', maxWidth: 'none', marginLeft: '-5%' }}
+                />
+              </AnimatePresence>
+
+              {/* Slide Indicator Pills */}
+              {trek.images.length > 1 && (
+                <div className="absolute bottom-4 left-4 z-10 flex items-center gap-1.5 bg-slate-900/60 backdrop-blur-md px-2.5 py-1.5 rounded-full">
+                  {trek.images.map((_, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setSelectedImageIndex(idx)}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        selectedImageIndex === idx
+                          ? 'w-6 bg-emerald-400'
+                          : 'w-1.5 bg-white/50 hover:bg-white/80'
+                      }`}
+                      aria-label={`Go to photo ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+
               <button
                 type="button"
                 onClick={() => setIsLightboxOpen(true)}
-                className="absolute bottom-4 right-4 bg-slate-900/80 backdrop-blur-md text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 hover:bg-slate-900 transition-colors shadow-sm"
+                className="absolute bottom-4 right-4 z-10 bg-slate-900/80 backdrop-blur-md text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 hover:bg-slate-900 transition-colors shadow-sm"
               >
                 <Maximize2 className="w-3.5 h-3.5" />
                 <span>View Fullscreen</span>
